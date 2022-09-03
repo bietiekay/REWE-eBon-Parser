@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REWE-eBon-Parser", "REWE-eBon-Parser\REWE-eBon-Parser.csproj", "{741C4256-454C-4E95-8BC2-C902D3DC9A1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "REWE-eBon-Parser", "REWE-eBon-Parser\REWE-eBon-Parser.csproj", "{741C4256-454C-4E95-8BC2-C902D3DC9A1E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REWEeBonParserLibrary", "REWEeBonParserLibrary\REWEeBonParserLibrary.csproj", "{E07FE801-5F90-484B-9317-BFF7A065FCAC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Projektmappenelemente", "{163BFE99-E552-4160-9B5C-BCDDD2A5C07E}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.txt = LICENSE.txt
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +23,10 @@ Global
 		{741C4256-454C-4E95-8BC2-C902D3DC9A1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{741C4256-454C-4E95-8BC2-C902D3DC9A1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{741C4256-454C-4E95-8BC2-C902D3DC9A1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E07FE801-5F90-484B-9317-BFF7A065FCAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E07FE801-5F90-484B-9317-BFF7A065FCAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E07FE801-5F90-484B-9317-BFF7A065FCAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E07FE801-5F90-484B-9317-BFF7A065FCAC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

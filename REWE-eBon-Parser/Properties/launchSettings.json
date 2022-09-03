@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "REWE-eBon-Parser": {
+      "commandName": "Project",
+      "commandLineArgs": "."
+    }
+  }
+}
