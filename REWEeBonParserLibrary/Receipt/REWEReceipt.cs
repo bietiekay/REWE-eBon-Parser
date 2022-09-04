@@ -12,6 +12,7 @@ namespace REWEeBonParserLibrary
         public Int32 cashRegisterNo;
         public Int32 shopId;
         public Int32 employeeID;
+        public Int32 receiptId;
         public String supermarketHeader;
         public Int32 PaybackPointsTotal;
         public Int32 PaybackPointsEarnedWithThisReceipt;
@@ -28,6 +29,31 @@ namespace REWEeBonParserLibrary
             get { 
                 return receiptItems.Sum(ReceiptItem => ReceiptItem.totalPrice); 
             } 
+        }
+
+        /// <summary>
+        /// parses from a fulltext line-by-line array representation all the receipt items and prices
+        /// </summary>
+        /// <param name="FulltextLines"></param>
+        public void ParseItemsFromText(String[] FulltextLines)
+        {
+            ReceiptItem previousReceiptItem;
+            bool startFound = false;
+
+            // go line by line
+            foreach(String line in FulltextLines)
+            {
+                // we have already found the start of the receipt item block
+                if (startFound)
+                {
+                    ^^
+
+                }
+
+                // is this the beginning of the receipt item block?
+                if (line == "EUR\n")
+                    startFound = true;
+            }
         }
     
     }

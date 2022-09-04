@@ -29,7 +29,13 @@ namespace REWEeBonParserLibrary
                     newReceipt.cashRegisterNo = GetCashRegisterNo(Fulltext);
                     newReceipt.employeeID = GetEmployeeNo(Fulltext);
                     newReceipt.shopId = GetShopId(Fulltext);
+                    newReceipt.receiptDateTime = GetReceiptDateTime(Fulltext);
+                    newReceipt.PaybackPointsEarnedWithThisReceipt = GetPaybackPointsEarned(Fulltext);
+                    newReceipt.PaybackPointsTotal = GetPaybackPointsTotal(Fulltext) + newReceipt.PaybackPointsEarnedWithThisReceipt;
+                    newReceipt.receiptId = GetReceiptId(Fulltext);
 
+                    // now for the actual receipt items
+                    newReceipt.ParseItemsFromText(FullTextByLines);
 
                     Console.WriteLine(newReceipt.shopId);
                 }
@@ -43,7 +49,116 @@ namespace REWEeBonParserLibrary
         }
 
         #region Parse Helpers
+        #region ReceiptDateTime
+        private DateTime GetReceiptDateTime(String Fulltext)
+        {
+            string datepattern = @"Datum:[^.]*(\d\d).(\d\d).(\d\d\d\d)";
+            string timepattern = @"Uhrzeit: [^.]*(..)[^.](..)[^\d](..).Uhr";
+            Int32 Hour, Minute, Second, Day, Month, Year;
 
+            RegexOptions options = RegexOptions.Multiline;
+            try
+            {
+                foreach (Match m in Regex.Matches(Fulltext, datepattern, options))
+                {
+                    if (m.Success)
+                    {
+                        if (m.Groups.Count == 4)
+                        {
+                            Day = Convert.ToInt32(m.Groups[1].Value);
+                            Month = Convert.ToInt32(m.Groups[2].Value);
+                            Year = Convert.ToInt32(m.Groups[3].Value);
+
+                            // since we found the Date lets go for the time now
+                            foreach (Match m2 in Regex.Matches(Fulltext, timepattern, options))
+                            {
+                                if (m2.Success)
+                                {
+                                    if (m2.Groups.Count == 4)
+                                    {
+                                        Hour = Convert.ToInt32(m2.Groups[1].Value);
+                                        Minute = Convert.ToInt32(m2.Groups[2].Value);
+                                        Second = Convert.ToInt32(m2.Groups[3].Value);
+
+                                        return new DateTime(Year,Month,Day,Hour,Minute,Second);
+                                    }                                        
+                                }
+                            }
+
+                        }
+                    }
+                }
+                return DateTime.MinValue;
+            } catch { return DateTime.MinValue; }
+        }
+        #endregion
+        #region PaybackPointsTotal
+        private Int32 GetPaybackPointsTotal(String Fulltext)
+        {
+            string pattern = @"Punktestand.vor.Einkauf:.(\d*)";
+
+            RegexOptions options = RegexOptions.Multiline;
+
+            foreach (Match m in Regex.Matches(Fulltext.Replace(".",""), pattern, options))
+            {
+                if (m.Success)
+                {
+                    if (m.Groups.Count > 1)
+                        return Convert.ToInt32(m.Groups[1].Value);
+                }
+            }
+            return 0;
+        }
+        #endregion
+        #region PaybackPointsEarned
+        private Int32 GetPaybackPointsEarned(String Fulltext)
+        {
+            string pattern = @"Sie.erhalten.(\d*).PAYBACK";
+
+            RegexOptions options = RegexOptions.Multiline;
+
+            foreach (Match m in Regex.Matches(Fulltext.Replace(".", ""), pattern, options))
+            {
+                if (m.Success)
+                {
+                    if (m.Groups.Count > 1)
+                        return Convert.ToInt32(m.Groups[1].Value);
+                }
+            }
+            return 0;
+        }
+        #endregion
+        #region ReceiptId
+        private Int32 GetReceiptId(String Fulltext)
+        {
+            string pattern1 = @"Beleg-Nr.\D*(\d*)";
+            string pattern2 = @"Trace-Nr.\D*(\d*)";
+
+            String result1 = "0";
+            String result2 = "0";
+
+            RegexOptions options = RegexOptions.Multiline;
+
+            foreach (Match m in Regex.Matches(Fulltext, pattern1, options))
+            {
+                if (m.Success)
+                {
+                    if (m.Groups.Count > 1)
+                        result1 = m.Groups[1].Value;
+                }
+            }
+            foreach (Match m in Regex.Matches(Fulltext, pattern2, options))
+            {
+                if (m.Success)
+                {
+                    if (m.Groups.Count > 1)
+                        result2 = m.Groups[1].Value;
+                }
+            }
+
+            return Convert.ToInt32((result1+result2));
+        }
+        #endregion
         #region ShopId
         private Int32 GetShopId(String Fulltext)
         {
@@ -115,7 +230,6 @@ namespace REWEeBonParserLibrary
             return MarketInformation;
         }
         #endregion
-
         #endregion
 
         #region PDF
