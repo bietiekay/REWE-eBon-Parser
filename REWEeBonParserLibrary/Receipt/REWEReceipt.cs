@@ -47,11 +47,13 @@ namespace REWEeBonParserLibrary
                 // we have already found the start of the receipt item block
                 if (startFound)
                 {
-                    Console.WriteLine(line);
+                    //Console.WriteLine(line);
 
                     // a line item if it ends with " B\n"
                     if (line.EndsWith(" B") || line.EndsWith(" A"))
                     {
+                        char type = line[line.Length - 1];
+
                         // Step 1 - remove " B"
                         String workItem = line.Remove(line.Length - 2, 2);
                         // Step 2 - split at first instance of " " from the right side
@@ -71,6 +73,7 @@ namespace REWEeBonParserLibrary
                         }
 
                         previousReceiptItem = new ReceiptItem(name, 1, Convert.ToSingle(price));
+                        previousReceiptItem.type = type;
                         receiptItems.Add(previousReceiptItem);
                         // next one!
                         continue;
@@ -83,12 +86,24 @@ namespace REWEeBonParserLibrary
                         String workItem = line.Remove(line.Length - 4, 4);
                         // Step 2 - split at first instance of " " from the right side
                         String price = workItem.Remove(0, workItem.LastIndexOf(" ") + 1).Replace(".", "").Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator);
-                        
-                        // add the deposit up the total price
+                        String name = workItem.Remove(workItem.LastIndexOf(" "), workItem.Length - workItem.LastIndexOf(" ")).Trim(' ');
+
+                        // add the deposit up to the correct item, either the previous one or a separate line
                         if (previousReceiptItem != null)
                         {
-                            previousReceiptItem.deposit += Convert.ToSingle(price);
+                            if (previousReceiptItem.type != 'A')
+                            {
+                                // if the type is different we actually just let it be a separate item
+                                previousReceiptItem = new ReceiptItem(name, 1, 0);
+                                previousReceiptItem.deposit += Convert.ToSingle(price);
+                                receiptItems.Add(previousReceiptItem);
+                            }
+                            else
+                            {
+                                previousReceiptItem.deposit += Convert.ToSingle(price);
+                            }
                         }
+                        continue;
                     }
 
                     // a credit line
@@ -103,6 +118,7 @@ namespace REWEeBonParserLibrary
                         previousReceiptItem = new ReceiptItem(name, 1, 0.0f);
                         previousReceiptItem.deposit = Convert.ToSingle(price);
                         receiptItems.Add(previousReceiptItem);
+                        continue;
                     }
 
                     // a simple multi-item line if it contains " Stk x "

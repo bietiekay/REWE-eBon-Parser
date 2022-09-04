@@ -245,7 +245,7 @@ namespace REWEeBonParserLibrary
                 foreach (var page in pdf.GetPages())
                 {
                     // Either extract based on order in the underlying document with newlines and spaces.
-                    eReceiptRawText += ContentOrderTextExtractor.GetText(page);
+                    eReceiptRawText += "\n"+ContentOrderTextExtractor.GetText(page);
                 }
                 return eReceiptRawText;
 

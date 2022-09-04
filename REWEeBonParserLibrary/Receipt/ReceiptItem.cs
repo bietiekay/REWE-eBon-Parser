@@ -13,19 +13,16 @@ namespace REWEeBonParserLibrary
     /// </summary>
     public class ReceiptItem
     {
+        public char type;
         public String name;
         public Single count;
         public Single singlePrice { get { return (totalPrice+deposit)/count; } }
         public Single totalPrice;
         public Single deposit;
        
-        public ReceiptItem(string Name, int Count, float TotalPrice)
+        public ReceiptItem(string Name, Single Count, float TotalPrice)
         {
             name = Name;
-
-            if (Count == 0)
-                throw new ArgumentOutOfRangeException("Count cannot be smaller than 1");
-
             count = Count;
 
             totalPrice = TotalPrice;
