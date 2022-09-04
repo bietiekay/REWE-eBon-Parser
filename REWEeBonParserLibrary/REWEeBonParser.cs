@@ -20,12 +20,14 @@ namespace REWEeBonParserLibrary
                 // first ensure that we got something from REWE here
                 if (Fulltext.Contains("REWE", StringComparison.OrdinalIgnoreCase))
                 {
+                    // prepare for special case of single-line-multi-item receipt items
+                    Fulltext = Fulltext.Replace(" B      ", " B\n");
                     // split up the Fulltext by lines
-                    String[] FullTextByLines = Fulltext.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    String[] FullTextByLines_run1 = Fulltext.Replace("\r","").Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
                     REWEReceipt newReceipt = new REWEReceipt();
                     
                     // parse the marketinformation
-                    newReceipt.supermarketHeader = GetMarketInformation(FullTextByLines);
+                    newReceipt.supermarketHeader = GetMarketInformation(FullTextByLines_run1);
                     newReceipt.cashRegisterNo = GetCashRegisterNo(Fulltext);
                     newReceipt.employeeID = GetEmployeeNo(Fulltext);
                     newReceipt.shopId = GetShopId(Fulltext);
@@ -35,7 +37,7 @@ namespace REWEeBonParserLibrary
                     newReceipt.receiptId = GetReceiptId(Fulltext);
 
                     // now for the actual receipt items
-                    newReceipt.ParseItemsFromText(FullTextByLines);
+                    newReceipt.ParseItemsFromText(FullTextByLines_run1);
 
                     Console.WriteLine(newReceipt.shopId);
                 }
@@ -129,13 +131,13 @@ namespace REWEeBonParserLibrary
         }
         #endregion
         #region ReceiptId
-        private Int32 GetReceiptId(String Fulltext)
+        private String GetReceiptId(String Fulltext)
         {
             string pattern1 = @"Beleg-Nr.\D*(\d*)";
             string pattern2 = @"Trace-Nr.\D*(\d*)";
 
-            String result1 = "0";
-            String result2 = "0";
+            String result1 = "";
+            String result2 = "";
 
             RegexOptions options = RegexOptions.Multiline;
 
@@ -156,7 +158,7 @@ namespace REWEeBonParserLibrary
                 }
             }
 
-            return Convert.ToInt32((result1+result2));
+            return result1 + result2;
         }
         #endregion
         #region ShopId

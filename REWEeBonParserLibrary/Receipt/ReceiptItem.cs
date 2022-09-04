@@ -14,9 +14,10 @@ namespace REWEeBonParserLibrary
     public class ReceiptItem
     {
         public String name;
-        public Int32 count;
-        public Single singlePrice { get { return totalPrice/count; } }
+        public Single count;
+        public Single singlePrice { get { return (totalPrice+deposit)/count; } }
         public Single totalPrice;
+        public Single deposit;
        
         public ReceiptItem(string Name, int Count, float TotalPrice)
         {
@@ -28,6 +29,11 @@ namespace REWEeBonParserLibrary
             count = Count;
 
             totalPrice = TotalPrice;
-        }        
+        }
+
+        public override String ToString()
+        {
+            return name;
+        }
     }
 }
