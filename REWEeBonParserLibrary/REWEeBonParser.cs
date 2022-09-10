@@ -9,12 +9,12 @@ using System.Text.RegularExpressions;
 
 namespace REWEeBonParserLibrary
 {
-    public class REWEeBonParser
+    public static class REWEeBonParser
     {
-        public REWEeBonParser(String FullPathPDFFile)
+        public static REWEReceipt parsePDF(String FullPathPDFFile)
         {
             String? Fulltext = ParsePDF(FullPathPDFFile); // parse the PDF file, assuming it is one
-            
+
             if (Fulltext != null) // if something got parsed successfully
             {
                 // first ensure that we got something from REWE here
@@ -23,9 +23,9 @@ namespace REWEeBonParserLibrary
                     // prepare for special case of single-line-multi-item receipt items
                     Fulltext = Fulltext.Replace(" B      ", " B\n");
                     // split up the Fulltext by lines
-                    String[] FullTextByLines_run1 = Fulltext.Replace("\r","").Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    String[] FullTextByLines_run1 = Fulltext.Replace("\r", "").Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
                     REWEReceipt newReceipt = new REWEReceipt();
-                    
+
                     // parse the marketinformation
                     newReceipt.supermarketHeader = GetMarketInformation(FullTextByLines_run1);
                     newReceipt.cashRegisterNo = GetCashRegisterNo(Fulltext);
@@ -39,11 +39,11 @@ namespace REWEeBonParserLibrary
                     // now for the actual receipt items
                     newReceipt.ParseItemsFromText(FullTextByLines_run1);
 
-                    Console.WriteLine(newReceipt.shopId);
+                    return newReceipt;
                 }
                 else
                     throw new InvalidDataException("This seems not a REWE receipt.");
-            }   
+            }
             else
             {
                 throw new InvalidDataException("Could not parse " + FullPathPDFFile);
@@ -52,7 +52,7 @@ namespace REWEeBonParserLibrary
 
         #region Parse Helpers
         #region ReceiptDateTime
-        private DateTime GetReceiptDateTime(String Fulltext)
+        private static DateTime GetReceiptDateTime(String Fulltext)
         {
             string datepattern = @"Datum:[^.]*(\d\d).(\d\d).(\d\d\d\d)";
             string timepattern = @"Uhrzeit: [^.]*(..)[^.](..)[^\d](..).Uhr";
@@ -95,7 +95,7 @@ namespace REWEeBonParserLibrary
         }
         #endregion
         #region PaybackPointsTotal
-        private Int32 GetPaybackPointsTotal(String Fulltext)
+        private static Int32 GetPaybackPointsTotal(String Fulltext)
         {
             string pattern = @"Punktestand.vor.Einkauf:.(\d*)";
 
@@ -113,7 +113,7 @@ namespace REWEeBonParserLibrary
         }
         #endregion
         #region PaybackPointsEarned
-        private Int32 GetPaybackPointsEarned(String Fulltext)
+        private static Int32 GetPaybackPointsEarned(String Fulltext)
         {
             string pattern = @"Sie.erhalten.(\d*).PAYBACK";
 
@@ -131,7 +131,7 @@ namespace REWEeBonParserLibrary
         }
         #endregion
         #region ReceiptId
-        private String GetReceiptId(String Fulltext)
+        private static String GetReceiptId(String Fulltext)
         {
             string pattern1 = @"Beleg-Nr.\D*(\d*)";
             string pattern2 = @"Trace-Nr.\D*(\d*)";
@@ -162,7 +162,7 @@ namespace REWEeBonParserLibrary
         }
         #endregion
         #region ShopId
-        private Int32 GetShopId(String Fulltext)
+        private static Int32 GetShopId(String Fulltext)
         {
             string pattern = @"Markt:([^\s]+)";
 
@@ -180,7 +180,7 @@ namespace REWEeBonParserLibrary
         }
         #endregion
         #region EmployeeNumber
-        private Int32 GetEmployeeNo(String Fulltext)
+        private static Int32 GetEmployeeNo(String Fulltext)
         {
             string pattern = @"Bed.:([^\s]+)";
 
@@ -198,7 +198,7 @@ namespace REWEeBonParserLibrary
         }
         #endregion
         #region CashRegisterNo
-        private Int32 GetCashRegisterNo(String Fulltext)
+        private static Int32 GetCashRegisterNo(String Fulltext)
         {
             string pattern = @"Kasse:([^\s]+)";
             
@@ -216,7 +216,7 @@ namespace REWEeBonParserLibrary
         }
         #endregion
         #region Market Information
-        private String GetMarketInformation(String[] Fulltext)
+        private static String GetMarketInformation(String[] Fulltext)
         {
             String MarketInformation = "";
 
