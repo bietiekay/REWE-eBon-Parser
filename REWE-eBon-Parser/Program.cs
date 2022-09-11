@@ -70,11 +70,8 @@ namespace REWEeBonParserFileWatcher
                         IncludeSubdirectories = true,
                         // Watch for all changes specified in the NotifyFilters
                         //enumeration.
-                        NotifyFilter = NotifyFilters.Attributes |
-                                       NotifyFilters.CreationTime |
-                                       NotifyFilters.DirectoryName |
-                                       NotifyFilters.FileName |
-                                       NotifyFilters.Size,
+                        NotifyFilter = NotifyFilters.LastWrite,
+
                         // Watch all files.
                         Filter = "*.pdf"
                     };
