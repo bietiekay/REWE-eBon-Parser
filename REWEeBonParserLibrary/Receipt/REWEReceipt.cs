@@ -30,7 +30,7 @@ namespace REWEeBonParserLibrary
         public float TotalAmount { 
             get { 
                 return receiptItems.Sum(ReceiptItem => ReceiptItem.totalPrice+ReceiptItem.deposit);
-            } 
+            }
         }
 
         /// <summary>

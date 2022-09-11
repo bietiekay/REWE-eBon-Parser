@@ -2,7 +2,10 @@
   "profiles": {
     "REWE-eBon-Parser": {
       "commandName": "Project",
-      "commandLineArgs": "."
+      "commandLineArgs": ". \"192.168.178.92\" \"test/external/rewe/\""
+    },
+    "Docker": {
+      "commandName": "Docker"
     }
   }
 }
