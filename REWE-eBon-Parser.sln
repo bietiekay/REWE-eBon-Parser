@@ -10,7 +10,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Projektmappenelemente", "{163BFE99-E552-4160-9B5C-BCDDD2A5C07E}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
-		REWE-eBon-Parser\Dockerfile = REWE-eBon-Parser\Dockerfile
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
 	EndProjectSection
