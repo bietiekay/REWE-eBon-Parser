@@ -70,8 +70,8 @@ namespace REWEeBonParserFileWatcher
                         IncludeSubdirectories = true,
                         // Watch for all changes specified in the NotifyFilters
                         //enumeration.
-                        NotifyFilter = NotifyFilters.LastWrite,
-                                       NotifyFilters.FileName,
+                        NotifyFilter = NotifyFilters.LastWrite |
+                                       NotifyFilters.FileName |
                                        NotifyFilters.Attributes,
 
                         // Watch all files.
