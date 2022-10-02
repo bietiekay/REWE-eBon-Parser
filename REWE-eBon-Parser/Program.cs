@@ -39,7 +39,7 @@ namespace REWEeBonParserFileWatcher
                         var receipt = REWEeBonParser.parsePDF(file);
 
                         unsortedReceipts.Add(receipt);
-                        Console.WriteLine(" - "+receipt.receiptDateTime.ToString());
+                        //Console.WriteLine(" - "+receipt.receiptDateTime.ToString());
                     }
                     catch (Exception)
                     {
@@ -71,6 +71,8 @@ namespace REWEeBonParserFileWatcher
                         // Watch for all changes specified in the NotifyFilters
                         //enumeration.
                         NotifyFilter = NotifyFilters.LastWrite,
+                                       NotifyFilters.FileName,
+                                       NotifyFilters.Attributes,
 
                         // Watch all files.
                         Filter = "*.pdf"
@@ -132,7 +134,7 @@ namespace REWEeBonParserFileWatcher
             if (LastKnownReceipt < receipt.receiptDateTime)
             {
                 File.WriteAllText(SettingsPath + Path.DirectorySeparatorChar + "lastknown.cfg", receipt.receiptDateTime.ToBinary().ToString());
-
+                Console.WriteLine("Sending to MQTT: " + receipt.receiptDateTime.ToBinary().ToString());
                 using (var mqttClient = mqttFactory.CreateMqttClient())
                 {
                     var mqttClientOptions = new MqttClientOptionsBuilder()
