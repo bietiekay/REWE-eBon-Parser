@@ -33,7 +33,7 @@ namespace REWEeBonParserFileWatcher
 
                 foreach (var file in Directory.EnumerateFiles(FilePath, "*.pdf"))
                 {
-                    Console.Write("Reading file: "+file);
+                    //Console.Write("Reading file: "+file);
                     try
                     {
                         var receipt = REWEeBonParser.parsePDF(file);
@@ -43,7 +43,7 @@ namespace REWEeBonParserFileWatcher
                     }
                     catch (Exception)
                     {
-                        Console.WriteLine(" - Error");
+                        //Console.WriteLine(" - Error");
                     }
                 }
                 #endregion
@@ -70,9 +70,11 @@ namespace REWEeBonParserFileWatcher
                         IncludeSubdirectories = true,
                         // Watch for all changes specified in the NotifyFilters
                         //enumeration.
-                        NotifyFilter = NotifyFilters.LastWrite |
+                        NotifyFilter = NotifyFilters.Attributes |
+                                       NotifyFilters.CreationTime |
+                                       NotifyFilters.DirectoryName |
                                        NotifyFilters.FileName |
-                                       NotifyFilters.Attributes,
+                                       NotifyFilters.Size,
 
                         // Watch all files.
                         Filter = "*.pdf"
