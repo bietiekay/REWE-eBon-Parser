@@ -56,10 +56,10 @@ namespace REWEeBonParserFileWatcher
                     Prefix = args[2];
 
                     // output all receipt information to mqtt - but only if it's a receipt we have not yet seen
-                    foreach (REWEReceipt receipt in sortedReceipts)
+                    /*foreach (REWEReceipt receipt in sortedReceipts)
                     {
                         publishReceiptToMQTT(FilePath, Broker, Prefix, receipt);
-                    }
+                    }*/
 
                     #region watch for new files
                     // Create a new FileSystemWatcher and set its properties.
