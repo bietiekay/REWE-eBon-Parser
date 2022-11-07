@@ -15,12 +15,12 @@ namespace REWEeBonParserLibrary
     {
         public char type;
         public String name;
-        public Single count;
-        public Single singlePrice { get { return (totalPrice+deposit)/count; } }
-        public Single totalPrice;
-        public Single deposit;
+        public Decimal count;
+        public Decimal singlePrice { get { return (totalPrice+deposit)/count; } }
+        public Decimal totalPrice;
+        public Decimal deposit;
        
-        public ReceiptItem(string Name, Single Count, float TotalPrice)
+        public ReceiptItem(string Name, Decimal Count, Decimal TotalPrice)
         {
             name = Name;
             count = Count;
