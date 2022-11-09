@@ -27,7 +27,7 @@ namespace REWEeBonParserLibrary
             receiptItems = new List<ReceiptItem>();
         }
 
-        public float TotalAmount { 
+        public Decimal TotalAmount { 
             get { 
                 return receiptItems.Sum(ReceiptItem => ReceiptItem.totalPrice+ReceiptItem.deposit);
             }
@@ -66,13 +66,13 @@ namespace REWEeBonParserLibrary
                             if (previousReceiptItem != null)
                             {
                                 // correct the price
-                                previousReceiptItem.totalPrice = previousReceiptItem.totalPrice + Convert.ToSingle(price);
+                                previousReceiptItem.totalPrice = previousReceiptItem.totalPrice + Convert.ToDecimal(price);
 
                                 continue;
                             }
                         }
 
-                        previousReceiptItem = new ReceiptItem(name, 1, Convert.ToSingle(price));
+                        previousReceiptItem = new ReceiptItem(name, 1, Convert.ToDecimal(price));
                         previousReceiptItem.type = type;
                         receiptItems.Add(previousReceiptItem);
                         // next one!
@@ -95,12 +95,12 @@ namespace REWEeBonParserLibrary
                             {
                                 // if the type is different we actually just let it be a separate item
                                 previousReceiptItem = new ReceiptItem(name, 1, 0);
-                                previousReceiptItem.deposit += Convert.ToSingle(price);
+                                previousReceiptItem.deposit += Convert.ToDecimal(price);
                                 receiptItems.Add(previousReceiptItem);
                             }
                             else
                             {
-                                previousReceiptItem.deposit += Convert.ToSingle(price);
+                                previousReceiptItem.deposit += Convert.ToDecimal(price);
                             }
                         }
                         continue;
@@ -115,8 +115,8 @@ namespace REWEeBonParserLibrary
                         String price = workItem.Remove(0, workItem.LastIndexOf(" ") + 1).Replace(".", "").Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator);
                         String name = workItem.Remove(workItem.LastIndexOf(" "), workItem.Length - workItem.LastIndexOf(" ")).Trim(' ');
 
-                        previousReceiptItem = new ReceiptItem(name, 1, 0.0f);
-                        previousReceiptItem.deposit = Convert.ToSingle(price);
+                        previousReceiptItem = new ReceiptItem(name, 1, 0.0m);
+                        previousReceiptItem.deposit = Convert.ToDecimal(price);
                         receiptItems.Add(previousReceiptItem);
                         continue;
                     }
@@ -131,7 +131,7 @@ namespace REWEeBonParserLibrary
                             if (previousReceiptItem != null)
                             {
                                 // set the last receipt item count
-                                previousReceiptItem.count = Convert.ToSingle(splitted[0]);
+                                previousReceiptItem.count = Convert.ToDecimal(splitted[0]);
                             }
                         }
 
@@ -147,7 +147,7 @@ namespace REWEeBonParserLibrary
                             if (previousReceiptItem != null)
                             {
                                 // set the last receipt item count
-                                previousReceiptItem.count = Convert.ToSingle(splitted[0].Replace(".", "").Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator));
+                                previousReceiptItem.count = Convert.ToDecimal(splitted[0].Replace(".", "").Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator));
                             }
                         }
 

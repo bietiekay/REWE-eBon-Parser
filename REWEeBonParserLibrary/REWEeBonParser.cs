@@ -23,7 +23,8 @@ namespace REWEeBonParserLibrary
                     // prepare for special case of single-line-multi-item receipt items
                     Fulltext = Fulltext.Replace(" B      ", " B\n");
                     // split up the Fulltext by lines
-                    String[] FullTextByLines_run1 = Fulltext.Replace("\r", "").Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    String[] FullTextByLines_run1 = Fulltext.Replace("\r", "")
+                        .Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
                     REWEReceipt newReceipt = new REWEReceipt();
 
                     // parse the marketinformation
@@ -33,7 +34,8 @@ namespace REWEeBonParserLibrary
                     newReceipt.shopId = GetShopId(Fulltext);
                     newReceipt.receiptDateTime = GetReceiptDateTime(Fulltext);
                     newReceipt.PaybackPointsEarnedWithThisReceipt = GetPaybackPointsEarned(Fulltext);
-                    newReceipt.PaybackPointsTotal = GetPaybackPointsTotal(Fulltext) + newReceipt.PaybackPointsEarnedWithThisReceipt;
+                    newReceipt.PaybackPointsTotal =
+                        GetPaybackPointsTotal(Fulltext) + newReceipt.PaybackPointsEarnedWithThisReceipt;
                     newReceipt.receiptId = GetReceiptId(Fulltext);
 
                     // now for the actual receipt items
@@ -51,11 +53,14 @@ namespace REWEeBonParserLibrary
         }
 
         #region Parse Helpers
+
         #region ReceiptDateTime
+
         private static DateTime GetReceiptDateTime(String Fulltext)
         {
             string datepattern = @"Datum:[^.]*(\d\d).(\d\d).(\d\d\d\d)";
             string timepattern = @"Uhrzeit: [^.]*(..)[^.](..)[^\d](..).Uhr";
+            string fallbackPattern = @"(\d\d).(\d\d).(\d\d\d\d)\D+(\d\d):(\d\d)\D+Bon-Nr";
             Int32 Hour, Minute, Second, Day, Month, Year;
 
             RegexOptions options = RegexOptions.Multiline;
@@ -63,45 +68,60 @@ namespace REWEeBonParserLibrary
             {
                 foreach (Match m in Regex.Matches(Fulltext, datepattern, options))
                 {
-                    if (m.Success)
+                    if (m.Success && m.Groups.Count == 4)
                     {
-                        if (m.Groups.Count == 4)
+                        Day = Convert.ToInt32(m.Groups[1].Value);
+                        Month = Convert.ToInt32(m.Groups[2].Value);
+                        Year = Convert.ToInt32(m.Groups[3].Value);
+
+                        // since we found the Date lets go for the time now
+                        foreach (Match m2 in Regex.Matches(Fulltext, timepattern, options))
                         {
-                            Day = Convert.ToInt32(m.Groups[1].Value);
-                            Month = Convert.ToInt32(m.Groups[2].Value);
-                            Year = Convert.ToInt32(m.Groups[3].Value);
-
-                            // since we found the Date lets go for the time now
-                            foreach (Match m2 in Regex.Matches(Fulltext, timepattern, options))
+                            if (m2.Success && m2.Groups.Count == 4)
                             {
-                                if (m2.Success)
-                                {
-                                    if (m2.Groups.Count == 4)
-                                    {
-                                        Hour = Convert.ToInt32(m2.Groups[1].Value);
-                                        Minute = Convert.ToInt32(m2.Groups[2].Value);
-                                        Second = Convert.ToInt32(m2.Groups[3].Value);
+                                Hour = Convert.ToInt32(m2.Groups[1].Value);
+                                Minute = Convert.ToInt32(m2.Groups[2].Value);
+                                Second = Convert.ToInt32(m2.Groups[3].Value);
 
-                                        return new DateTime(Year,Month,Day,Hour,Minute,Second);
-                                    }                                        
-                                }
+                                return new DateTime(Year, Month, Day, Hour, Minute, Second);
                             }
-
                         }
                     }
                 }
+
+                foreach (Match m in Regex.Matches(Fulltext, fallbackPattern, options))
+                {
+                    if (m.Success && m.Groups.Count == 6)
+                    {
+                        Day = Convert.ToInt32(m.Groups[1].Value);
+                        Month = Convert.ToInt32(m.Groups[2].Value);
+                        Year = Convert.ToInt32(m.Groups[3].Value);
+
+                        Hour = Convert.ToInt32(m.Groups[1].Value);
+                        Minute = Convert.ToInt32(m.Groups[2].Value);
+                        return new DateTime(Year, Month, Day, Hour, Minute, 0);
+                    }
+                }
+
                 return DateTime.MinValue;
-            } catch { return DateTime.MinValue; }
+            }
+            catch
+            {
+                return DateTime.MinValue;
+            }
         }
+
         #endregion
+
         #region PaybackPointsTotal
+
         private static Int32 GetPaybackPointsTotal(String Fulltext)
         {
             string pattern = @"Punktestand.vor.Einkauf:.(\d*)";
 
             RegexOptions options = RegexOptions.Multiline;
 
-            foreach (Match m in Regex.Matches(Fulltext.Replace(".",""), pattern, options))
+            foreach (Match m in Regex.Matches(Fulltext.Replace(".", ""), pattern, options))
             {
                 if (m.Success)
                 {
@@ -109,10 +129,14 @@ namespace REWEeBonParserLibrary
                         return Convert.ToInt32(m.Groups[1].Value);
                 }
             }
+
             return 0;
         }
+
         #endregion
+
         #region PaybackPointsEarned
+
         private static Int32 GetPaybackPointsEarned(String Fulltext)
         {
             string pattern = @"Sie.erhalten.(\d*).PAYBACK";
@@ -127,17 +151,23 @@ namespace REWEeBonParserLibrary
                         return Convert.ToInt32(m.Groups[1].Value);
                 }
             }
+
             return 0;
         }
+
         #endregion
+
         #region ReceiptId
+
         private static String GetReceiptId(String Fulltext)
         {
             string pattern1 = @"Beleg-Nr.\D*(\d*)";
             string pattern2 = @"Trace-Nr.\D*(\d*)";
+            string pattern3 = @"Bon-Nr.\D*(\d*)";
 
             String result1 = "";
             String result2 = "";
+            String result3 = "";
 
             RegexOptions options = RegexOptions.Multiline;
 
@@ -149,6 +179,7 @@ namespace REWEeBonParserLibrary
                         result1 = m.Groups[1].Value;
                 }
             }
+
             foreach (Match m in Regex.Matches(Fulltext, pattern2, options))
             {
                 if (m.Success)
@@ -158,10 +189,25 @@ namespace REWEeBonParserLibrary
                 }
             }
 
-            return result1 + result2;
+            if (!string.IsNullOrEmpty(result1 + result2))
+                return result1 + result2;
+            
+            foreach (Match m in Regex.Matches(Fulltext, pattern3, options))
+            {
+                if (m.Success)
+                {
+                    if (m.Groups.Count > 1)
+                        return m.Groups[1].Value;
+                }
+            }
+
+            return string.Empty;
         }
+
         #endregion
+
         #region ShopId
+
         private static Int32 GetShopId(String Fulltext)
         {
             string pattern = @"Markt:([^\s]+)";
@@ -176,10 +222,14 @@ namespace REWEeBonParserLibrary
                         return Convert.ToInt32(m.Groups[1].Value);
                 }
             }
+
             return 0;
         }
+
         #endregion
+
         #region EmployeeNumber
+
         private static Int32 GetEmployeeNo(String Fulltext)
         {
             string pattern = @"Bed.:([^\s]+)";
@@ -194,33 +244,41 @@ namespace REWEeBonParserLibrary
                         return Convert.ToInt32(m.Groups[1].Value);
                 }
             }
+
             return 0;
         }
+
         #endregion
+
         #region CashRegisterNo
+
         private static Int32 GetCashRegisterNo(String Fulltext)
         {
             string pattern = @"Kasse:([^\s]+)";
-            
+
             RegexOptions options = RegexOptions.Multiline;
 
             foreach (Match m in Regex.Matches(Fulltext, pattern, options))
             {
-             if (m.Success)
+                if (m.Success)
                 {
                     if (m.Groups.Count > 1)
                         return Convert.ToInt32(m.Groups[1].Value);
                 }
             }
+
             return 0;
         }
+
         #endregion
+
         #region Market Information
+
         private static String GetMarketInformation(String[] Fulltext)
         {
             String MarketInformation = "";
 
-            foreach(String FulltextLine in Fulltext)
+            foreach (String FulltextLine in Fulltext)
             {
                 if (FulltextLine.StartsWith("EUR"))
                     break;
@@ -231,10 +289,13 @@ namespace REWEeBonParserLibrary
 
             return MarketInformation;
         }
+
         #endregion
+
         #endregion
 
         #region PDF
+
         private static String? ParsePDF(String FullPathPDFFile)
         {
             try
@@ -245,12 +306,17 @@ namespace REWEeBonParserLibrary
                 foreach (var page in pdf.GetPages())
                 {
                     // Either extract based on order in the underlying document with newlines and spaces.
-                    eReceiptRawText += "\n"+ContentOrderTextExtractor.GetText(page);
+                    eReceiptRawText += "\n" + ContentOrderTextExtractor.GetText(page);
                 }
-                return eReceiptRawText;
 
-            } catch { return null; }
+                return eReceiptRawText;
+            }
+            catch
+            {
+                return null;
+            }
         }
+
         #endregion
     }
 }
